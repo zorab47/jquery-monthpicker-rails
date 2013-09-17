@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.version     = Jquery::Monthpicker::Rails::VERSION
   s.authors     = ["Charles Maresh"]
   s.email       = ["cmaresh@gmail.com"]
-  s.homepage    = "https://github.com/cmaresh/jquery-monthpicker-rails"
+  s.homepage    = "https://github.com/zorab47/jquery-monthpicker-rails"
   s.summary     = "jQuery Monthpicker packaged for the Rails asset pipeline"
   s.description = "jQuery Monthpicker's JavaScript files packaged for the Rails 3.1+ asset pipeline"
   s.license     = "MIT"
