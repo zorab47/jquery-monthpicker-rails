@@ -1,6 +1,6 @@
 # jquery-monthpicker-rails
 
-This gem packages the JQuery Monthpicker assets for the Rails 3.1+ asset pipeline.
+This gem packages the jQuery Monthpicker assets for the Rails 3.1+ asset pipeline.
 
 # Usage
 
