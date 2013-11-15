@@ -2,6 +2,8 @@
 
 This gem packages the [jQuery Monthpicker][] assets for the Rails 3.1+ asset pipeline.
 
+[![Gem Version](https://badge.fury.io/rb/jquery-monthpicker-rails.png)](http://badge.fury.io/rb/jquery-monthpicker-rails)
+
 # Usage
 
 In your Gemfile, add:
