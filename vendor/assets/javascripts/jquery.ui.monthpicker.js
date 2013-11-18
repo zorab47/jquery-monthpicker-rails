@@ -43,8 +43,9 @@
 		this._mainDivId = 'ui-monthpicker-div'; // The ID of the main monthpicker division
 		this._triggerClass = 'ui-monthpicker-trigger'; // The name of the trigger marker class
 		this._dialogClass = 'ui-monthpicker-dialog'; // The name of the dialog marker class
-    this._currentClass = "ui-datepicker-current-day"; // The name of the current day marker class
+    this._currentClass = "ui-datepicker-today"; // The name of the current day marker class
     this._dayOverClass = "ui-datepicker-days-cell-over"; // The name of the day hover marker class
+		this._unselectableClass = "ui-datepicker-unselectable"; // The name of the unselectable cell marker class
 		this.regional = []; // Available regional settings, indexed by language code
 		this.regional[''] = { // Default regional settings
       closeText: "Done", // Display text for close link
@@ -198,6 +199,7 @@
 
 		/* Make attachments based on settings. */
 		_attachments: function(input, inst) {
+			var buttonText, buttonImage;
 			var appendText = this._get(inst, "appendText"),
         isRTL = this._get(inst, "isRTL");
 
@@ -667,13 +669,15 @@
 		
 		/* Generate the HTML for the current state of the date picker. */
 		_generateHTML: function(inst) {
-      var printDate, hideIfNoPrevNext;
+      var printDate, hideIfNoPrevNext, unselectable;
 
 			hideIfNoPrevNext = false;
 			var today = new Date();
 			today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // clear time
 			var currentDate = (!inst.currentMonth ? new Date(9999, 9, 9) :
 				new Date(inst.currentYear, inst.currentMonth, 1));
+			var minDate = this._getMinMaxDate(inst, "min");
+			var maxDate = this._getMinMaxDate(inst, "max");
 			var html = '';
 			var year = currentDate && currentDate.year ? currentDate.year : 2011;
 			var prevText = this._get(inst, 'prevText');
@@ -706,7 +710,7 @@
 				(hideIfNoPrevNext ? "" : "<a class='ui-datepicker-next ui-corner-all ui-state-disabled' title='"+ nextText + "'><span class='ui-icon ui-icon-circle-triangle-" + ( isRTL ? "w" : "e") + "'>" + nextText + "</span></a>"));
 
       html += '<div class="ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-all">' +
-        prev + next + this._generateYearHeader(inst, drawYear) + // draw year header
+        prev + next + this._generateYearHeader(inst, drawYear, minDate, maxDate) + // draw year header
         '</div><table class="ui-datepicker-calendar"><tbody>';
 			
 			// draw months table
@@ -716,10 +720,12 @@
 				}
 
         printDate = new Date(drawYear, month, 1);
+				unselectable = (minDate && printDate < minDate) || (maxDate && printDate > maxDate);
 				var selectedDate = new Date(drawYear, inst.selectedMonth, 1);
 
 				html += '<td class="'
 					+ (drawYear == inst.currentYear && month == inst.currentMonth ? " " + this._currentClass : "") // highlight selected month
+					+ (unselectable ? " " + this._unselectableClass + " ui-state-disabled": "")  // highlight unselectable months
           + ((month === inst.selectedMonth && drawYear === inst.selectedYear && inst._keyEvent) || // user pressed key
 							(defaultDate.getTime() === printDate.getTime() && defaultDate.getTime() === selectedDate.getTime()) ?
 							// or defaultDate is current printedDate and defaultDate is selectedDate
@@ -754,7 +760,8 @@
 		},
 			
 		/* Generate the year header. */
-		_generateYearHeader: function(inst, drawYear) {
+		_generateYearHeader: function(inst, drawYear, minDate, maxDate) {
+			var inMinYear, inMaxYear;
 			var changeYear = this._get(inst, 'changeYear');
 			var html = '<div class="ui-datepicker-title">';
 			// year selection
@@ -773,6 +780,9 @@
 					};
 					var year = determineYear(years[0]);
 					var endYear = Math.max(year, determineYear(years[1] || ''));
+
+					year = (minDate ? Math.max(year, minDate.getFullYear()) : year);
+					endYear = (maxDate ? Math.min(endYear, maxDate.getFullYear()) : endYear);
 					
 					inst.yearshtml += '<select class="ui-datepicker-year" ' +
             "data-handler='selectYear' data-event='change'>";
@@ -900,8 +910,9 @@
 
 		/* Determines if we should allow a "next/prev" year display change. */
 		_canAdjustYear: function(inst, offset, curYear) {
-			var date = new Date(curYear + offset, 1, 1);
-			return this._isInRange(inst, date);
+			var firstMonth = new Date(curYear + offset,  0, 1);
+			var lastMonth  = new Date(curYear + offset, 11, 1);
+			return this._isInRange(inst, firstMonth) || this._isInRange(inst, lastMonth);
 		},
 
 		/* Is the given date in the accepted range? */
