@@ -9,7 +9,7 @@ This gem packages the [jQuery Monthpicker][] assets for the Rails 3.1+ asset pip
 In your Gemfile, add:
 
 ```ruby
-gem "jquery-monthpicker-rails", "~> 0.0.1"
+gem "jquery-monthpicker-rails", "~> 1.0.0"
 ```
 
 Then require the javascript in your application.js
